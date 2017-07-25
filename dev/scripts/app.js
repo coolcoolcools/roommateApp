@@ -1,15 +1,65 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import firebase, {auth, database, provider, dbRef} from "./firebase.js";
 
 class App extends React.Component {
+	constructor() {
+		super();
+		this.state = {
+			loggedIn: false,
+			user: null
+		}
+		this.login = this.login.bind(this);
+		this.logout = this.logout.bind(this);
+	}
     render() {
       return (
         <div>
           Hello
+          <button onClick={this.login}>Login</button>
+          <button onClick={this.logout}>Logout</button>
         </div>
       )
     }
+    componentDidMount() {
+    	auth.onAuthStateChange((user) => {
+    		if (user) {
+    			this.setState({
+    				loggedIn: true,
+	                user: user
+	            	})
+    			} else {
+    				this.setState({
+    					loggedIn: false,
+    					user: null
+    				})
+    			}
+    		});
+    	}
+	login() {
+	    auth.signInWithPopup(provider)
+	    
+	        .then((result) => {
+	            const user = result.user;
+	            this.setState({
+	                loggedIn: true,
+	                user: user
+	            });
+	            console.log(user);
+	        });
+	}
+	logout() {
+	    auth.signOut()
+	        .then(() => {
+	            this.setState({
+	                loggedIn: false,
+	                user: null
+	            });
+	        });
+	}
+
 }
+
 
 
 // 1. Home login screen (login button, google auth)
